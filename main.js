@@ -1,14 +1,14 @@
 const util = require("util")
+const { Lexer } = require('./lexer');
+const { Parser } = require('./parser');
 
-const {Lexer} = require('./lexer')
-const {Parser} = require('./parser')
-
+const input = "2 + 3 * (4 - 1)";
 
 const lexer = new Lexer();
-const input = '10 * (10 + 3 * 3 -2)';
-const tokens = lexer.tokenizer(input)
+const tokenStorage = Array.from(lexer.tokenizer(input));
+const parser = new Parser(tokenStorage);
 
-const parser = new Parser(tokens);
 
-const ast = parser.parse();
-console.log(util.inspect(ast, {showHidden: false, depth: null, colors: true})); // usuwa problem z  rightSide: [Object]
+const parsedResult = parser.parse();
+
+console.log(util.inspect(parsedResult, {showHidden: false, depth: null, colors: true}));

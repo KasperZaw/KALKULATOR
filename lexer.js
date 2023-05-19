@@ -17,73 +17,72 @@ class Lexer {
     return this.str[this.cursor];
   }
 
-  tokenizer(input = "") {
-    this.str = input;
-    this.cursor = 0;
-    const tokenStorage = [];
+  *tokenizer(input = "") {
+    let cursor = 0;
 
-    while (this.cursor < this.str.length) {
-      if (this.currentPosition() === " " || this.currentPosition() === "\t") {
-        this.cursor++;
+    while (cursor < input.length) {
+      const char = input[cursor];
+  
+      if (char === " " || char === "\t") {
+        cursor++;
         continue;
       }
-
-      switch (this.currentPosition()) {
+  
+      switch (char) {
         case "+":
-          tokenStorage.push({ type: Tokens.AddToken, value: "+" });
+          yield ({ type: Tokens.AddToken, value: "+" });
           break;
-
+  
         case "-":
-          tokenStorage.push({ type: Tokens.SubToken, value: "-" });
+          yield ({ type: Tokens.SubToken, value: "-" });
           break;
-
+  
         case "/":
-          tokenStorage.push({ type: Tokens.DivToken, value: "/" });
+          yield ({ type: Tokens.DivToken, value: "/" });
           break;
-
+  
         case "*":
-          tokenStorage.push({ type: Tokens.MultToken, value: "*" });
+          yield ({ type: Tokens.MultToken, value: "*" });
           break;
-
+  
         case "(":
-          tokenStorage.push({ type: Tokens.BracketOpen, value: "(" });
+          yield ({ type: Tokens.BracketOpen, value: "(" });
           break;
-
+  
         case ")":
-          tokenStorage.push({ type: Tokens.BracketClosed, value: ")" });
+          yield ({ type: Tokens.BracketClosed, value: ")" });
           break;
-
+  
         default:
-          if (isNumeric(this.currentPosition())) {
-            let strNumber = "";
-
+          if (isNumeric(char)) {
+            let strNumber = char;
+  
             while (
-              this.cursor < this.str.length &&
-              isNumeric(this.currentPosition())
+              cursor < input.length - 1 &&
+              isNumeric(input[cursor + 1])
             ) {
-              strNumber += this.currentPosition();
-              this.cursor++;
+              cursor++;
+              strNumber += input[cursor];
             }
-
-            tokenStorage.push({
+  
+            yield ({
               type: Tokens.Number,
               value: parseInt(strNumber),
             });
-
-            this.cursor--;
           } else {
             throw new Error(
-              `Oops, Expected a valid number token at ${this.cursor}!`
+              `Oops, Expected a valid number token at ${cursor}!`
             );
           }
-
+  
           break;
       }
-      this.cursor++;
+  
+      cursor++;
     }
-
-    tokenStorage.push({ type: Tokens.EOF, value: "EOF" });
-    return tokenStorage;
+  
+    yield ({ type: Tokens.EOF, value: "EOF" });
+  
   }
 }
 
